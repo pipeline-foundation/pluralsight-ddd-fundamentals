@@ -64,7 +64,7 @@ jobs:
           nuget pack .\SharedKernel\src\PluralsightDdd.SharedKernel\PluralsightDdd.SharedKernel.csproj `
           -OutputDirectory Artifacts `
           -Properties Configuration=Release `
-          -Version ${{ steps.tag_generator.outputs.new_version }}
+          -Properties Version=${{ steps.tag_generator.outputs.new_version }}
 
       - if: steps.tag_generator.outputs.new_version != ''
         name: Upload artifacts
