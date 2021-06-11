@@ -80,12 +80,6 @@ jobs:
     needs: ci
     runs-on: ubuntu-latest
     steps:
-      - name: Setup dotnet
-        id: setup_dotnet
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 5.0.102
-
       - name: Checkout repository
         id: checkout_repo
         uses: actions/checkout@v2
