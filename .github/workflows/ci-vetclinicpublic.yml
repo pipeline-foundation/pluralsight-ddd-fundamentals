@@ -1,0 +1,38 @@
+name: VetClinicPublic CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'VetClinicPublic/src/**' ]
+  pull_request:
+    branches: [ main, dev ]
+    paths: [ 'VetClinicPublic/src/**' ]
+
+jobs:
+  ci:
+    name: Continuous Integration
+    runs-on: windows-latest
+    steps:
+      - name: Setup .NET Core
+        id: setup_dotnet_core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.102
+
+      - name: Checkout repository
+        id: checkout_repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Build VetClinicPublic solution
+        id: build_vetclinicpublic_solution
+        shell: pwsh
+        run: |
+          dotnet build .\VetClinicPublic\VetClinicPublic.sln --configuration Release
+
+      - name: test VetClinicPublic solution
+        id: test_vetclinicpublic_solution
+        shell: pwsh
+        run: |
+          dotnet test .\VetClinicPublic\VetClinicPublic.sln --configuration Release
