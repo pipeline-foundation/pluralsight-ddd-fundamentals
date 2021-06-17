@@ -13,6 +13,12 @@ jobs:
     name: Continuous Integration
     runs-on: windows-latest
     steps:
+      - name: Setup .NET Core
+        id: setup_dotnet_core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.102
+
       - name: Checkout repository
         id: checkout_repo
         uses: actions/checkout@v2
