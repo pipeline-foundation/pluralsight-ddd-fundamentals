@@ -27,7 +27,7 @@ jobs:
         id: setup_dotnet_core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '5.0.x'
+          dotnet-version: 5.0.301
 
       - name: Checkout repository
         id: checkout_repo
