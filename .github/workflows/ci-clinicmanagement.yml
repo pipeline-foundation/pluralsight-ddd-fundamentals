@@ -2,11 +2,10 @@ name: ClinicManagement CI Pipeline
 
 on:
   push:
-    branches: [ main ]
     paths: [ 'ClinicManagement/src/**' ]
   pull_request:
-    branches: [ main, dev ]
     paths: [ 'ClinicManagement/src/**' ]
+  workflow_dispatch:
 
 jobs:
   ci:
@@ -25,14 +24,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Build ClinicManagement solution
-        id: build_clinicmanagement_solution
+      - name: Build solution
+        id: build_solution
         shell: pwsh
         run: |
           dotnet build .\ClinicManagement\ClinicManagement.sln --configuration Release
 
-      - name: test ClinicManagement
-        id: test_clinicmanagement
+      - name: Run unit tests
+        id: run_unit_tests
         shell: pwsh
         run: |
           dotnet test .\ClinicManagement\ClinicManagement.sln --configuration Release
