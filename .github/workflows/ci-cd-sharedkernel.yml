@@ -69,7 +69,7 @@ jobs:
         id: run_unit_tests
         shell: pwsh
         run: |
-          dotnet test .\SharedKernel\SharedKernel.sln --configuration Release --no-build
+          dotnet test .\SharedKernel\SharedKernel.sln --configuration Release --no-build --output Artifacts
 
       - if: steps.tag_generator.outputs.new_version != ''
         name: Create NuGet Package
