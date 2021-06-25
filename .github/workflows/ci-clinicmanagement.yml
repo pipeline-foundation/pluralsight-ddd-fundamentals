@@ -34,7 +34,7 @@ jobs:
         id: run_unit_tests
         shell: pwsh
         run: |
-          dotnet test .\ClinicManagement\ClinicManagement.sln --configuration Release
+          dotnet test .\ClinicManagement\ClinicManagement.sln --configuration Release --no-build
 
       - name: Upload artifacts
         id: upload_artifacts
