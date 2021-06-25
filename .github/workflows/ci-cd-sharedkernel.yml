@@ -81,14 +81,20 @@ jobs:
           -Properties "Configuration=Release;Version=${{ steps.tag_generator.outputs.new_version }}"
 
       - if: steps.tag_generator.outputs.new_version != ''
-        name: Upload artifacts
-        id: upload_artifacts
+        name: Upload build artifacts
+        id: upload_build_artifacts
         uses: actions/upload-artifact@v2
         with:
           name: Artifacts
-          path: |
-            Artifacts/
-            NuGet/
+          path: Artifacts/
+
+      - if: steps.tag_generator.outputs.new_version != ''
+        name: Upload NuGet packages
+        id: upload_nuget_packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: NuGet packages
+          path: NuGet/
 
   cd:
     if: needs.ci.outputs.latest_version != ''
@@ -102,18 +108,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download artifacts
+      - name: Download NuGet packages
         id: download_artifacts
         uses: actions/download-artifact@v2
         with:
-          name: Artifacts
+          name: NuGet packages
           path: NuGet/
 
       - name: Publish to NuGet
         id: publish_to_nuget
         shell: pwsh
         run: |
-          nuget push ./Artifacts/PluralsightDdd.SharedKernel.${{ needs.ci.outputs.latest_version }}.nupkg `
+          nuget push NuGet/PluralsightDdd.SharedKernel.${{ needs.ci.outputs.latest_version }}.nupkg `
           -Source https://api.nuget.org/v3/index.json `
           -ApiKey ${{ secrets.NUGET_API_KEY }}
 
@@ -123,7 +129,7 @@ jobs:
         run: |
           $releaseTag = "v${{ needs.ci.outputs.latest_version }}"
           $releaseTitle = "PluralsightDdd.SharedKernel v${{ needs.ci.outputs.latest_version }}"
-          $releaseAssets = 'Artifacts/PluralsightDdd.SharedKernel.${{ needs.ci.outputs.latest_version }}.nupkg'
+          $releaseAssets = 'NuGet/PluralsightDdd.SharedKernel.${{ needs.ci.outputs.latest_version }}.nupkg'
 
           gh release create $releaseTag --title $releaseTitle $releaseAssets
         env:
