@@ -63,7 +63,7 @@ jobs:
         id: build_solution
         shell: pwsh
         run: |
-          dotnet build .\SharedKernel\SharedKernel.sln --configuration Release
+          dotnet build .\SharedKernel\SharedKernel.sln --configuration Release --output Artifacts
 
       - name: Run unit tests
         id: run_unit_tests
@@ -77,16 +77,18 @@ jobs:
         shell: pwsh
         run: |
           nuget pack .\SharedKernel\src\PluralsightDdd.SharedKernel\PluralsightDdd.SharedKernel.csproj `
-          -OutputDirectory Artifacts `
+          -OutputDirectory NuGet `
           -Properties "Configuration=Release;Version=${{ steps.tag_generator.outputs.new_version }}"
 
       - if: steps.tag_generator.outputs.new_version != ''
         name: Upload artifacts
         id: upload_artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
-          name: PluralsightDdd.SharedKernel.${{ steps.tag_generator.outputs.new_version }}
-          path: Artifacts/
+          name: Artifacts
+          path: |
+            Artifacts/
+            NuGet/
 
   cd:
     if: needs.ci.outputs.latest_version != ''
@@ -104,8 +106,8 @@ jobs:
         id: download_artifacts
         uses: actions/download-artifact@v2
         with:
-          name: PluralsightDdd.SharedKernel.${{ needs.ci.outputs.latest_version }}
-          path: Artifacts/
+          name: Artifacts
+          path: NuGet/
 
       - name: Publish to NuGet
         id: publish_to_nuget
