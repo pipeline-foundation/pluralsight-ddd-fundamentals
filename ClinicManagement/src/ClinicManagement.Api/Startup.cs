@@ -1,13 +1,14 @@
 ﻿using System.Linq;
 using System.Reflection;
-using Autofac;
 using BlazorShared;
+using ClinicManagement.Core.Aggregates;
 using ClinicManagement.Core.Interfaces;
 using ClinicManagement.Infrastructure;
 using ClinicManagement.Infrastructure.Data;
 using ClinicManagement.Infrastructure.Messaging;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -15,8 +16,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.ObjectPool;
-using RabbitMQ.Client;
 
 namespace ClinicManagement.Api
 {
@@ -108,14 +107,36 @@ namespace ClinicManagement.Api
       // configure messaging
       var messagingConfig = Configuration.GetSection("RabbitMq");
       services.Configure<RabbitMqConfiguration>(messagingConfig);
-      services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
-      services.AddSingleton<IPooledObjectPolicy<IModel>, RabbitModelPooledObjectPolicy>();
-    }
+      services.AddScoped<IMessagePublisher, MassTransitMessagePublisher>();
 
-    public void ConfigureContainer(ContainerBuilder builder)
-    {
-      bool isDevelopment = (_env.EnvironmentName == "Development");
-      builder.RegisterModule(new DefaultInfrastructureModule(isDevelopment, Assembly.GetExecutingAssembly()));
+      services.AddMassTransit(x =>
+      {
+        var rabbitMqConfiguration = messagingConfig.Get<RabbitMqConfiguration>();
+        x.SetKebabCaseEndpointNameFormatter();
+        
+        x.UsingRabbitMq((context, cfg) =>
+        {
+          var port = (ushort)rabbitMqConfiguration.Port;
+          cfg.Host(rabbitMqConfiguration.Hostname, port, rabbitMqConfiguration.VirtualHost, h =>
+          {
+            h.Username(rabbitMqConfiguration.UserName);
+            h.Password(rabbitMqConfiguration.Password);
+          });
+          
+          cfg.ConfigureEndpoints(context);
+        });
+      });
+
+      var assemblies = new Assembly[]
+      {
+        typeof(Room).Assembly,
+        typeof(DefaultInfrastructureModule).Assembly,
+        typeof(Startup).Assembly,
+      };
+      services.AddMediatR(config => config.RegisterServicesFromAssemblies(assemblies));
+
+      var isDevelopment = _env.IsDevelopment();
+      services.AddInfrastructureDependencies(isDevelopment);
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

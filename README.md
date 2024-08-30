@@ -166,9 +166,6 @@ Provides a generic result type that can be returned from application services. C
 [Ardalis.HttpClientTestExtensions](https://www.nuget.org/packages/Ardalis.HttpClientTestExtensions/)
 Removes boilerplate code from ASP.NET Core API integration/functional tests.
 
-[Autofac](https://www.nuget.org/packages/Autofac/)
-Powerful open source DI/IOC container for .NET that supports more features than built-in ServiceCollection.
-
 [Blazored.LocalStorage](https://www.nuget.org/packages/Blazored.LocalStorage/)
 Blazor utility for accessing browser local storage in Blazor WebAssembly apps.
 
@@ -181,7 +178,7 @@ Includes required trial binaries from Telerik. Currently this includes both Kend
 [PluralsightDdd.SharedKernel](https://www.nuget.org/packages/PluralsightDdd.SharedKernel/)
 An example SharedKernel package used by this sample built just for this course.
 
-[RabbitMQ.Client](https://www.nuget.org/packages/RabbitMQ.Client/)
+[MassTransit.RabbitMQ](https://www.nuget.org/packages/MassTransit.RabbitMQ/)
 Client for communicating with RabbitMQ.
 
 ## 5. Credits
